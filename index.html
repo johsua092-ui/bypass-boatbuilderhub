@@ -1,59 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Boat Builder Hub Bypass</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kirim Pesan WA Tanpa Identitas</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #121212; color: #00ff99; }
-    h1 { font-size: 2em; margin-bottom: 20px; }
-    p { font-size: 1.2em; }
-    button { padding: 15px 30px; font-size: 1em; background: #00ff99; color: #000; border: none; border-radius: 5px; cursor: pointer; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #00ff99;
+      text-align: center;
+      padding: 50px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 1em;
+    }
+    button {
+      background: #00ff99;
+      color: #000;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <h1>Boat Builder Hub Bypass</h1>
-  <p>Klik tombol di bawah untuk unlock premium otomatis:</p>
-  <button onclick="startBypass()">🚀 Unlock Premium</button>
+  <h1>Kirim Pesan WA Tanpa Identitas</h1>
+  <p>Isi nomor WA tujuan dan pesan, lalu klik tombol di bawah:</p>
+  <input type="text" id="nomor" placeholder="Nomor WA (628xxxx)" />
+  <br/>
+  <textarea id="pesan" placeholder="Pesan yang akan dikirim..." rows="4" cols="50"></textarea>
+  <br/>
+  <button onclick="kirimPesan()">🚀 Kirim Pesan</button>
+  <p id="status"></p>
 
   <script>
-    async function startBypass() {
-      try {
-        const key = await getKeyFromLinkvertise();
-        injectBypassScript(key);
-        alert("✅ Premium unlocked! Refresh Roblox jika perlu.");
-      } catch (error) {
-        alert("❌ Gagal unlock premium: " + error.message);
+    async function kirimPesan() {
+      const nomor = document.getElementById("nomor").value.trim();
+      const pesan = document.getElementById("pesan").value.trim();
+      const status = document.getElementById("status");
+
+      if (!nomor || !pesan) {
+        status.textContent = "❌ Nomor dan pesan harus diisi!";
+        return;
       }
-    }
 
-    async function getKeyFromLinkvertise() {
-      const url = "https://ads.luarmor.net/get_key?for=BoatBuilderHub_Linkvertise-RMgzLzWbeeYz";
-      const response = await fetch(url, { method: "GET", redirect: "follow" });
-      const finalUrl = response.url;
+      try {
+        const response = await fetch("https://api.example.com/kirim-wa", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nomor, pesan })
+        });
 
-      const match = finalUrl.match(/key=([^&]+)/);
-      if (!match) throw new Error("Key tidak ditemukan di URL.");
-      return match[1];
-    }
-
-    function injectBypassScript(key) {
-      const script = document.createElement("script");
-      script.textContent = `
-        (function() {
-          const xeno = getgenv().xeno;
-          if (!xeno) throw new Error("Xeno 1.3.25b diperlukan!");
-
-          // Unlock premium
-          xeno.hook({ name: "isPremium", callback: () => true });
-          xeno.hook({ name: "validate", callback: () => true });
-
-          // Inject key
-          loadstring(game:HttpGet("https://raw.githubusercontent.com/catblox1346/StensUIReMake/refs/heads/main/Script/boatbuilderhub_B1", true))();
-          game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("BoatBuilderHub"):WaitForChild("Frame"):WaitForChild("KeyInput").Text = "${key}";
-          game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("BoatBuilderHub"):WaitForChild("Frame"):WaitForChild("Submit").Click:Fire();
-        })();
-      `;
-      document.body.appendChild(script);
+        if (response.ok) {
+          status.textContent = "✅ Pesan berhasil dikirim!";
+        } else {
+          status.textContent = "❌ Gagal mengirim pesan.";
+        }
+      } catch (error) {
+        status.textContent = "❌ Error: " + error.message;
+      }
     }
   </script>
 </body>
